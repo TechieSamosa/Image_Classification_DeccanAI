@@ -12,6 +12,10 @@ app = FastAPI()
 # Load the trained model using a corrected path (use forward slashes or a raw string)
 model = tf.keras.models.load_model(r"D:\Projects and Coding\Version Control Systems\Image_Classification_DeccanAI\Notebook\model\final_model.h5")
 
+@app.get("/")
+def read_root():
+    return {"message": "Fashion MNIST Classifier API is running!"}
+
 
 # Define the class names for predictions
 class_names = [
@@ -26,6 +30,7 @@ def preprocess_image(image: Image.Image):
     image = np.array(image) / 255.0
     image = np.expand_dims(image, axis=0)
     return image
+
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...), user: str = Depends(get_current_user)):

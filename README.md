@@ -1,20 +1,22 @@
 # Image Classification Project
+
 **Author**: Aditya Khamitkar  
 **Email**: [khamitkaraditya@gmail.com](mailto:khamitkaraditya@gmail.com)  
-**Assessment for**: Soul AI by Deccan AI
+**Assessment for**: Soul AI by Deccan AI  
 
 ---
 
 ## Overview
-This repository demonstrates an end-to-end image classification pipeline on the **Fashion MNIST** dataset using **TensorFlow** and **FastAPI**. It includes:
+This project demonstrates an end-to-end image classification pipeline using **TensorFlow**, **FastAPI**, and **Streamlit** on the **Fashion MNIST** dataset. It includes:
 
-1. A **Jupyter Notebook** (`Image_Classification.ipynb`) for data preprocessing, model training, and evaluation.
-2. A **FastAPI** application (`app.py`) exposing a `/predict` endpoint for model inference.
-3. A **Streamlit** frontend (`frontend.py`) for easy interaction with the model.
-4. A **Dockerfile** to containerize the application.
-5. A **report.md** detailing the approach, decisions, and implementation.
+1. **Jupyter Notebook** (`Image_Classification.ipynb`) for model training and evaluation.
+2. **FastAPI backend** (`app.py`) serving a `/predict` endpoint.
+3. **Streamlit frontend** (`frontend.py`) for easy interaction.
+4. **Authentication module** (`auth.py`) for secure API access.
+5. **Docker support** for easy deployment.
+6. **Comprehensive documentation** (`report.md`).
 
-> **Note**: This project is part of an assessment for **Soul AI** by **Deccan AI**.
+This project is part of an assessment for **Soul AI** by **Deccan AI**.
 
 ---
 
@@ -23,11 +25,13 @@ This repository demonstrates an end-to-end image classification pipeline on the 
 ```
 ├── app
 │   ├── app.py          # FastAPI backend
-│   ├── auth.py         # Authentication (HTTP Basic or Bearer Token)
+│   ├── auth.py         # Authentication module
 │   ├── frontend.py     # Streamlit frontend
-│   └── requirements.txt # Dependencies
+│   ├── requirements.txt # Dependencies
 ├── Notebook
-│   └── Image_Classification.ipynb # Model training and evaluation
+│   └── Image_Classification.ipynb # Model training & evaluation
+├── model
+│   └── final_model.h5  # Trained model
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE
@@ -37,76 +41,75 @@ This repository demonstrates an end-to-end image classification pipeline on the 
 
 ### Key Components
 
-1. **`Image_Classification.ipynb`**  
-   - Loads the Fashion MNIST dataset.  
-   - Preprocesses and augments images (resize, normalize).  
-   - Builds and trains a CNN model.  
-   - Evaluates performance using accuracy, confusion matrix, etc.  
-   - Saves the trained model (`.h5` format).
+#### **1. `Image_Classification.ipynb`**
+- Loads **Fashion MNIST dataset**.
+- Preprocesses and augments images.
+- Builds and trains a **CNN model**.
+- Saves the trained model in `.h5` format.
 
-2. **`app.py`**  
-   - Loads the saved model.  
-   - Implements the `/predict` endpoint with **FastAPI**.  
-   - Accepts images via `POST` requests.  
-   - Returns prediction results (class + confidence score).
+#### **2. `app.py` (FastAPI Backend)**
+- Loads the saved model.
+- Implements the `/predict` endpoint.
+- Accepts images via `POST` requests.
+- Returns prediction results (class + confidence score).
 
-3. **`auth.py`**  
-   - Provides **basic authentication** or **token-based** authentication (depending on the version you choose).  
-   - Restricts access to the `/predict` endpoint unless correct credentials are provided.
+#### **3. `auth.py` (Authentication Module)**
+- Implements **Bearer Token authentication**.
+- Restricts access to the API.
 
-4. **`frontend.py`**  
-   - Simple **Streamlit** interface for uploading images.  
-   - Forwards the image to the FastAPI endpoint.  
-   - Displays the predicted class and confidence score.
+#### **4. `frontend.py` (Streamlit UI)**
+- Provides a simple UI to upload images.
+- Calls the `/predict` API.
+- Displays the **predicted class & confidence score**.
 
-5. **`Dockerfile`**  
-   - Containerizes the FastAPI app for easy deployment.  
-   - Installs dependencies and exposes port `8000`.
+#### **5. `Dockerfile` (Containerization)**
+- Containerizes the FastAPI application.
+- Installs dependencies and exposes port `8000`.
 
-6. **`report.md`**  
-   - Summarizes data preprocessing, model selection, training, evaluation metrics, and deployment steps.  
-   - Describes potential improvements like advanced data augmentation, transfer learning, or cloud deployment.
+#### **6. `report.md` (Documentation)**
+- Summarizes **data preprocessing, model selection, training, and deployment**.
+- Discusses potential improvements (e.g., transfer learning, cloud deployment).
 
 ---
 
 ## Installation & Setup
 
-1. **Clone the Repository**  
-   ```bash
-   git clone https://github.com/your-username/image-classification.git
-   cd image-classification
-   ```
+### **1️⃣ Clone the Repository**
+```bash
+git clone https://github.com/your-username/image-classification.git
+cd image-classification
+```
 
-2. **Install Dependencies**  
-   ```bash
-   pip install -r requirements.txt
-   ```
+### **2️⃣ Install Dependencies**
+```bash
+pip install -r requirements.txt
+```
 
-3. **Run the Jupyter Notebook** *(Optional for retraining)*  
-   ```bash
-   jupyter notebook Notebook/Image_Classification.ipynb
-   ```
-   - This step is only necessary if you want to retrain or modify the model.
+### **3️⃣ Run the Jupyter Notebook** *(Optional for retraining)*
+```bash
+jupyter notebook Notebook/Image_Classification.ipynb
+```
+- This step is **only necessary** if you want to **retrain the model**.
 
-4. **Start the FastAPI Server**  
-   ```bash
-   uvicorn app.app:app --reload
-   ```
-   - The API will be available at `http://127.0.0.1:8000`.
+### **4️⃣ Start the FastAPI Server**
+```bash
+uvicorn app:app --reload
+```
+- The API will be available at `http://127.0.0.1:8000`.
 
-5. **Run the Streamlit Frontend**  
-   ```bash
-   streamlit run app/frontend.py
-   ```
-   - Visit the provided URL (typically `http://localhost:8501`) to upload images and get predictions.
+### **5️⃣ Run the Streamlit Frontend**
+```bash
+streamlit run frontend.py
+```
+- Visit `http://localhost:8501` to upload images & get predictions.
 
 ---
 
-## Authentication
-Depending on the `auth.py` version you choose, you’ll
-- Provide a **Bearer token** in your request header.
+## Authentication (Bearer Token)
 
-Example using Bearer Token:
+To make API requests, you **must** provide a valid authentication token.
+
+#### **Example: cURL Request with Token**
 ```bash
 curl -X POST -H "Authorization: Bearer mysecuretoken" \
      -F "file=@path_to_image.jpg" \
@@ -115,17 +118,40 @@ curl -X POST -H "Authorization: Bearer mysecuretoken" \
 
 ---
 
-## Docker Deployment
-To run everything in a container:
-1. **Build the Docker image**:
-   ```bash
-   docker build -t image-classification .
-   ```
-2. **Run the container**:
-   ```bash
-   docker run -p 8000:8000 image-classification
-   ```
-3. The FastAPI app will be available at `http://127.0.0.1:8000`.
+## Running with Docker
+
+### **1️⃣ Build the Docker Image**
+```bash
+docker build -t image-classification .
+```
+
+### **2️⃣ Run the Container**
+```bash
+docker run -p 8000:8000 image-classification
+```
+
+- The **FastAPI app** will be available at `http://127.0.0.1:8000`.
+- To access the **frontend**, run Streamlit separately.
+
+---
+
+## Debugging & Troubleshooting
+
+| **Issue** | **Possible Cause & Fix** |
+|-----------|--------------------------|
+| **No response / app hangs** | The FastAPI backend (`uvicorn`) might not be running. Run: `uvicorn app:app --reload` |
+| **403: Forbidden** | Ensure `Authorization` header in `frontend.py` has `Bearer mysecuretoken`. |
+| **500: Internal Server Error** | Model input might not match. Try printing `processed_image.shape` before `model.predict()`. |
+| **404: Not Found** | Check if the API URL is correct in `frontend.py` (`http://127.0.0.1:8000/predict`). |
+
+---
+
+## Future Improvements
+- **Use Transfer Learning**: Models like MobileNetV2 or EfficientNet can improve accuracy.
+- **Grad-CAM Visualization**: Implement Grad-CAM to interpret model predictions.
+- **Deploy on Cloud**: AWS, GCP, or Azure for scalability.
+- **Improve Authentication**: Use OAuth2 or JWT instead of a static token.
+- **Enhance UI**: Add drag-and-drop, batch uploads, and result history.
 
 ---
 
@@ -139,15 +165,16 @@ This project is licensed under the terms of the [MIT License](LICENSE).
 
 ---
 
-### Author
+### **Author**
 **Aditya Khamitkar**  
 [khamitkaraditya@gmail.com](mailto:khamitkaraditya@gmail.com)
 
 ---
 
 ## Special Notes
-- This code was written as part of an **Assessment for Soul AI by Deccan AI**.  
-- For production use, secure your credentials properly (avoid hardcoding) and consider advanced authentication/authorization schemes.  
-- Future improvements could include advanced data augmentation, transfer learning (e.g., MobileNet, EfficientNet), Grad-CAM for interpretability, and cloud deployment (AWS, GCP, Azure).
+- This project is part of an **Assessment for Soul AI by Deccan AI**.
+- For production use, **secure credentials properly** (avoid hardcoding).
+- Future enhancements may include **cloud deployment, improved UI, and deeper model analysis**.
 
 ---
+
