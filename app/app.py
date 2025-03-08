@@ -10,7 +10,8 @@ from auth import get_current_user
 app = FastAPI()
 
 # Load the trained model using a corrected path (use forward slashes or a raw string)
-model = tf.keras.models.load_model(r"Notebook/model/final_model.h5")
+model = tf.keras.models.load_model(r"D:\Projects and Coding\Version Control Systems\Image_Classification_DeccanAI\Notebook\model\final_model.h5")
+
 
 # Define the class names for predictions
 class_names = [
