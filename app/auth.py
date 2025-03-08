@@ -1,21 +1,12 @@
-# auth.py
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-import secrets
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-security = HTTPBasic()
+token_auth_scheme = HTTPBearer()
 
-# Hardcoded credentials (adjust for production use)
-USERNAME = "Khamitkar"
-PASSWORD = "Deccan@Ai"
+# Dummy token for authentication
+VALID_TOKEN = "mysecuretoken"
 
-def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, USERNAME)
-    correct_password = secrets.compare_digest(credentials.password, PASSWORD)
-    if not (correct_username and correct_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
+def get_current_user(credentials: HTTPAuthorizationCredentials = Security(token_auth_scheme)):
+    if credentials.credentials != VALID_TOKEN:
+        raise HTTPException(status_code=403, detail="Invalid authentication token")
+    return "authorized_user"

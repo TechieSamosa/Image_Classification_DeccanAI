@@ -1,133 +1,153 @@
 # Image Classification Project
+**Author**: Aditya Khamitkar  
+**Email**: [khamitkaraditya@gmail.com](mailto:khamitkaraditya@gmail.com)  
+**Assessment for**: Soul AI by Deccan AI
 
-This repository implements an image classification model on the CIFAR-10 dataset using EfficientNetB0 with transfer learning. The project covers the complete pipeline from exploratory data analysis (EDA) and data preprocessing to model training, evaluation, and deployment as a REST API. Bonus features include Grad-CAM explainability, logging and error handling, and an interactive frontend built with Streamlit.
+---
+
+## Overview
+This repository demonstrates an end-to-end image classification pipeline on the **Fashion MNIST** dataset using **TensorFlow** and **FastAPI**. It includes:
+
+1. A **Jupyter Notebook** (`Image_Classification.ipynb`) for data preprocessing, model training, and evaluation.
+2. A **FastAPI** application (`app.py`) exposing a `/predict` endpoint for model inference.
+3. A **Streamlit** frontend (`frontend.py`) for easy interaction with the model.
+4. A **Dockerfile** to containerize the application.
+5. A **report.md** detailing the approach, decisions, and implementation.
+
+> **Note**: This project is part of an assessment for **Soul AI** by **Deccan AI**.
+
+---
 
 ## Project Structure
 
 ```
-image-classification-project/
-├── app/
-│   ├── app.py                # FastAPI application for serving predictions and Grad-CAM visualizations
-│   ├── auth.py               # Basic authentication for API endpoints
-│   ├── frontend.py           # Streamlit frontend for interactive demo
-│   └── requirements.txt      # Dependencies for the API and frontend
-├── data/
-│   ├── raw/                  # Original dataset files (if applicable)
-│   └── processed/            # Preprocessed images (optional)
-├── evaluation/
-│   ├── confusion_matrix.png  # Confusion matrix plot generated during evaluation
-│   └── classification_report.txt  # Classification report (precision, recall, F1-score)
-├── logs/
-│   └── app.log               # Application logs
-├── model/
-│   ├── best_model.h5         # Best model checkpoint during training
-│   └── final_model.h5        # Final saved model for deployment
-├── notebooks/
-│   └── EDA.ipynb             # Jupyter Notebook for exploratory data analysis
-├── src/
-│   ├── __init__.py           # Package initializer
-│   ├── data_preprocessing.py # Data loading and preprocessing functions
-│   ├── evaluate.py           # Model evaluation script
-│   ├── explainability.py     # Grad-CAM implementation for model explainability
-│   ├── model.py              # Model architecture definition (EfficientNetB0 based)
-│   ├── train.py              # Training script with callbacks, logging, and checkpointing
-│   └── utils.py              # Utility functions including logging configuration
-├── Dockerfile                # Docker configuration file (if containerizing the API)
-├── README.md                 # Project overview and setup instructions
-└── report.md                 # Detailed report documenting the project methodology
+├── app
+│   ├── app.py          # FastAPI backend
+│   ├── auth.py         # Authentication (HTTP Basic or Bearer Token)
+│   ├── frontend.py     # Streamlit frontend
+│   └── requirements.txt # Dependencies
+├── Notebook
+│   └── Image_Classification.ipynb # Model training and evaluation
+├── .gitignore
+├── Dockerfile
+├── LICENSE
+├── README.md
+└── report.md
 ```
 
-## Getting Started
+### Key Components
 
-### Prerequisites
-- Python 3.7+
-- Virtual environment (recommended)
-- Docker (optional, if containerizing the API)
+1. **`Image_Classification.ipynb`**  
+   - Loads the Fashion MNIST dataset.  
+   - Preprocesses and augments images (resize, normalize).  
+   - Builds and trains a CNN model.  
+   - Evaluates performance using accuracy, confusion matrix, etc.  
+   - Saves the trained model (`.h5` format).
 
-### Setup Instructions
+2. **`app.py`**  
+   - Loads the saved model.  
+   - Implements the `/predict` endpoint with **FastAPI**.  
+   - Accepts images via `POST` requests.  
+   - Returns prediction results (class + confidence score).
 
-1. **Clone the Repository:**
+3. **`auth.py`**  
+   - Provides **basic authentication** or **token-based** authentication (depending on the version you choose).  
+   - Restricts access to the `/predict` endpoint unless correct credentials are provided.
+
+4. **`frontend.py`**  
+   - Simple **Streamlit** interface for uploading images.  
+   - Forwards the image to the FastAPI endpoint.  
+   - Displays the predicted class and confidence score.
+
+5. **`Dockerfile`**  
+   - Containerizes the FastAPI app for easy deployment.  
+   - Installs dependencies and exposes port `8000`.
+
+6. **`report.md`**  
+   - Summarizes data preprocessing, model selection, training, evaluation metrics, and deployment steps.  
+   - Describes potential improvements like advanced data augmentation, transfer learning, or cloud deployment.
+
+---
+
+## Installation & Setup
+
+1. **Clone the Repository**  
    ```bash
-   git clone https://github.com/yourusername/image-classification-project.git
-   cd image-classification-project
+   git clone https://github.com/your-username/image-classification.git
+   cd image-classification
    ```
 
-2. **Create and Activate Virtual Environment:**
+2. **Install Dependencies**  
    ```bash
-   python -m venv venv
-   # On macOS/Linux:
-   source venv/bin/activate
-   # On Windows:
-   venv\Scripts\activate
+   pip install -r requirements.txt
    ```
 
-3. **Install Dependencies:**
-   - Install main project dependencies:
-     ```bash
-     pip install -r app/requirements.txt
-     pip install tensorflow opencv-python matplotlib seaborn scikit-learn pillow python-multipart streamlit
-     ```
-   
-4. **Data Preparation & EDA:**
-   - Open the `notebooks/EDA.ipynb` notebook in Jupyter Notebook or JupyterLab to review the exploratory data analysis.
+3. **Run the Jupyter Notebook** *(Optional for retraining)*  
+   ```bash
+   jupyter notebook Notebook/Image_Classification.ipynb
+   ```
+   - This step is only necessary if you want to retrain or modify the model.
 
-5. **Training the Model:**
-   - Run the training script:
-     ```bash
-     python src/train.py
-     ```
-   - The model checkpoints and final model will be saved in the `model/` directory.
+4. **Start the FastAPI Server**  
+   ```bash
+   uvicorn app.app:app --reload
+   ```
+   - The API will be available at `http://127.0.0.1:8000`.
 
-6. **Evaluating the Model:**
-   - Execute the evaluation script:
-     ```bash
-     python src/evaluate.py
-     ```
-   - Check the `evaluation/` directory for confusion matrix and classification report.
+5. **Run the Streamlit Frontend**  
+   ```bash
+   streamlit run app/frontend.py
+   ```
+   - Visit the provided URL (typically `http://localhost:8501`) to upload images and get predictions.
 
-7. **Running the API:**
-   - Start the FastAPI server with Uvicorn:
-     ```bash
-     uvicorn app.app:app --reload
-     ```
-   - The API will be accessible at [http://localhost:8000](http://localhost:8000).
+---
 
-8. **Using the Frontend:**
-   - Launch the Streamlit app:
-     ```bash
-     streamlit run app/frontend.py
-     ```
-   - Use the web interface to upload images for classification and view Grad-CAM visualizations.
+## Authentication
+Depending on the `auth.py` version you choose, you’ll
+- Provide a **Bearer token** in your request header.
 
-9. **(Optional) Docker:**
-   - Build the Docker image:
-     ```bash
-     docker build -t image-classification-api .
-     ```
-   - Run the Docker container:
-     ```bash
-     docker run -p 8000:8000 image-classification-api
-     ```
+Example using Bearer Token:
+```bash
+curl -X POST -H "Authorization: Bearer mysecuretoken" \
+     -F "file=@path_to_image.jpg" \
+     http://127.0.0.1:8000/predict
+```
 
-## API Authentication
+---
 
-The API endpoints are secured using basic HTTP authentication. Default credentials are:
+## Docker Deployment
+To run everything in a container:
+1. **Build the Docker image**:
+   ```bash
+   docker build -t image-classification .
+   ```
+2. **Run the container**:
+   ```bash
+   docker run -p 8000:8000 image-classification
+   ```
+3. The FastAPI app will be available at `http://127.0.0.1:8000`.
 
-- **Username:** `Khamitkar`
-- **Password:** `Deccan@Ai`
+---
 
-You can adjust these credentials in the `app/auth.py` file.
+## Contributing
+Feel free to open issues or submit pull requests. This is a demonstration project, so any improvements or new ideas are welcome.
 
-## Bonus Features
+---
 
-- **Grad-CAM Explainability:** Use the `/gradcam` endpoint to generate visual explanations.
-- **Logging & Error Handling:** Logs are saved in the `logs/` directory.
-- **Streamlit Frontend:** Interactive demo for image classification and Grad-CAM visualizations.
+## License
+This project is licensed under the terms of the [MIT License](LICENSE).
 
-## Contact
+---
 
-For any questions or issues, please open an issue in this repository or contact me at [e-Mail](mailto:khamitkaraditya@gmail.com).
+### Author
+**Aditya Khamitkar**  
+[khamitkaraditya@gmail.com](mailto:khamitkaraditya@gmail.com)
 
-Enjoy exploring and improving the project!
+---
 
+## Special Notes
+- This code was written as part of an **Assessment for Soul AI by Deccan AI**.  
+- For production use, secure your credentials properly (avoid hardcoding) and consider advanced authentication/authorization schemes.  
+- Future improvements could include advanced data augmentation, transfer learning (e.g., MobileNet, EfficientNet), Grad-CAM for interpretability, and cloud deployment (AWS, GCP, Azure).
 
+---

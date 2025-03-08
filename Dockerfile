@@ -1,21 +1,18 @@
-# Use a slim Python 3.9 image as the base
-FROM python:3.9-slim
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the API requirements file and install dependencies
-COPY app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements.txt and install dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install any additional dependencies not in requirements.txt
-RUN pip install tensorflow opencv-python matplotlib seaborn scikit-learn pillow python-multipart streamlit
-
-# Copy the rest of your application code into the container
+# Copy the rest of the code
 COPY . .
 
-# Expose port 8000 for the FastAPI app
+# Expose port 8000 for the API
 EXPOSE 8000
 
-# Command to run the API using Uvicorn
-CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the FastAPI app with uvicorn
+CMD [\"uvicorn\", \"app:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]

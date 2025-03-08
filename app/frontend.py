@@ -1,53 +1,48 @@
-# frontend.py
 import streamlit as st
 import requests
-import cv2
-import numpy as np
 from PIL import Image
 import io
 
-# API endpoint configuration (adjust URL if deployed)
-API_URL = "http://localhost:8000/predict"
-GRADCAM_URL = "http://localhost:8000/gradcam"
+# Title and project description
+st.title("Fashion MNIST Image Classifier")
+st.markdown("""
+### About This Project
+**Author:** Aditya Khamitkar  
+**Assessment for:** Soul AI by Deccan AI
 
-# Basic auth credentials (should match those in auth.py)
-AUTH = ("admin", "password123")
+This project was developed as an assessment to showcase the process of building and deploying an image classification model. The goal is to classify clothing items from the Fashion MNIST dataset into 10 categories such as T-shirt, Trouser, Pullover, Dress, and more.
 
-st.title("Image Classification Demo")
-st.write("Upload an image to classify it using our EfficientNet-based model.")
+**How It Works:**  
+1. **Image Upload:** You upload an image (PNG, JPG, or JPEG) via the file uploader.  
+2. **Preprocessing:** The image is converted to RGB, resized to 96x96 pixels, and normalized.  
+3. **Prediction:** The preprocessed image is sent to a FastAPI endpoint that hosts a trained CNN model.  
+4. **Result Display:** The predicted class and the confidence score are returned and displayed.
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+**Fun Facts:**  
+- The Fashion MNIST dataset is a modern replacement for the classic MNIST dataset, offering 70,000 grayscale images of clothing items.  
+- It covers 10 different classes, making it an excellent benchmark for basic image classification tasks.  
+- This project demonstrates key concepts in computer vision and deep learning, such as data preprocessing, model training, and API deployment.
+""")
+
+# File uploader widget
+uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
+
+# Authentication token (should match the one in auth.py)
+token = "mysecuretoken"
+headers = {"Authorization": f"Bearer {token}"}
 
 if uploaded_file is not None:
-    # Display the uploaded image
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
     
-    # Option to perform classification
     if st.button("Classify Image"):
-        # Prepare file for API request
-        files = {"file": uploaded_file.getvalue()}
-        try:
-            response = requests.post(API_URL, files={"file": uploaded_file}, auth=AUTH)
+        with st.spinner("Predicting..."):
+            img_bytes = io.BytesIO()
+            image.save(img_bytes, format="PNG")
+            response = requests.post("http://127.0.0.1:8000/predict", files={"file": img_bytes.getvalue()}, headers=headers)
+            
             if response.status_code == 200:
                 result = response.json()
-                st.success(f"Predicted Class: {result['predicted_class']} (Confidence: {result['confidence']:.2f})")
+                st.success(f"Prediction: {result['class']} ({result['confidence']*100:.2f}%)")
             else:
-                st.error(f"Error: {response.json()['detail']}")
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-
-    st.write("### Generate Grad-CAM Visualization")
-    if st.button("Generate Grad-CAM"):
-        try:
-            response = requests.post(GRADCAM_URL, files={"file": uploaded_file}, auth=AUTH)
-            if response.status_code == 200:
-                result = response.json()
-                st.success(result["message"])
-                # Display Grad-CAM image if available
-                gradcam_image = Image.open("gradcam_output.jpg")
-                st.image(gradcam_image, caption="Grad-CAM Output", use_column_width=True)
-            else:
-                st.error(f"Error: {response.json()['detail']}")
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+                st.error("Error in prediction")
