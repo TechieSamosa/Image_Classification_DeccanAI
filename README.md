@@ -76,7 +76,7 @@ This project is part of an assessment for **Soul AI** by **Deccan AI**.
 
 ### **1️⃣ Clone the Repository**
 ```bash
-git clone https://github.com/your-username/image-classification.git
+git clone https://github.com/TechieSamosa/image-classification.git
 cd image-classification
 ```
 
